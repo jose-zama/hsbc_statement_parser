@@ -25,7 +25,7 @@ pub fn parse(document:&str)-> BalanceStatement{
 	// let mut period_start:Date<Local>;
 	// let mut period_end:Date<Local>;
 
-	let mut periodo_name: String = String::from("");
+	let mut periodo_value: String = String::from("");
 
 	loop {
 	    match reader.read_event(&mut buf) {
@@ -36,13 +36,12 @@ pub fn parse(document:&str)-> BalanceStatement{
 	                	println!("attributes values: {:?}",
 	                                    e.attributes()
 	                                    .map(|a| a.unwrap().value)
-	                                    .map(|a| str::from_utf8(a).unwrap())
 	                                    .collect::<Vec<_>>());
-	                	periodo_name = e.attributes()
-	                                    .map(|a| a.unwrap().key)
-	                                    .map(|a| str::from_utf8(a).unwrap())
-	                                    .collect::<Vec<_>>()[1].to_string();
-
+	                	let vaca = &e.attributes()
+	                                    .map(|a| a.unwrap().value)
+	                                    .collect::<Vec<_>>()[1];
+	                    periodo_value = str::from_utf8(vaca).unwrap().to_string();
+	                    println!("---{:?}", vaca);
 	                }
 	                _ => (),
 	            }
@@ -57,7 +56,7 @@ pub fn parse(document:&str)-> BalanceStatement{
 	    buf.clear();
 	}
 
-	println!("{:?}", periodo_name);
+	println!("{:?}", periodo_value);
 
 		BalanceStatement::new(	
 			String::from(""),
