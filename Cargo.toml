@@ -1,0 +1,8 @@
+[package]
+name = "hsbc_parser"
+version = "0.1.0"
+authors = ["Zama <pepeazb@hotmail.com>"]
+
+[dependencies]
+chrono = "0.4"
+quick-xml = "0.12.0"
