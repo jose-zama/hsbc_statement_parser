@@ -22,26 +22,17 @@ pub fn parse(document:&str)-> BalanceStatement{
 	let mut txt = Vec::new();
 	let mut buf = Vec::new();
 
-	// let mut period_start:Date<Local>;
-	// let mut period_end:Date<Local>;
-
-	let mut periodo_value: String = String::from("");
+	let mut period: String = String::from("");
 
 	loop {
 	    match reader.read_event(&mut buf) {
 	        Ok(Event::Start(ref e)) => {
 	            match e.name() {
 	                b"DG:DatosGenerales" => {
-
-	                	println!("attributes values: {:?}",
-	                                    e.attributes()
-	                                    .map(|a| a.unwrap().value)
-	                                    .collect::<Vec<_>>());
 	                	let vaca = &e.attributes()
 	                                    .map(|a| a.unwrap().value)
 	                                    .collect::<Vec<_>>()[1];
-	                    periodo_value = str::from_utf8(vaca).unwrap().to_string();
-	                    println!("---{:?}", vaca);
+	                    period = str::from_utf8(vaca).unwrap().to_string();
 	                }
 	                _ => (),
 	            }
@@ -56,12 +47,14 @@ pub fn parse(document:&str)-> BalanceStatement{
 	    buf.clear();
 	}
 
-	println!("{:?}", periodo_value);
+	let period = period.split('-').collect::<Vec<&str>>();
+	let period_start:Date<Local> = Local.datetime_from_str(&(period[0].to_string()+"00:00:00"),"%d/%m/%Y%H:%M:%S").unwrap().date();
+	let period_end:Date<Local>= Local.datetime_from_str(&(period[1].to_string()+"00:00:00"),"%d/%m/%Y%H:%M:%S").unwrap().date();
 
 		BalanceStatement::new(	
 			String::from(""),
-			Local::today(),
-			Local::today(),
+			period_start,
+			period_end,
 			0.0,
 			0.0,
 			0.0,
