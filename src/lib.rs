@@ -3,9 +3,6 @@ extern crate quick_xml;
 
 pub mod balance_statement;
 
-// pub use self::balance_statement::BalanceStatement;
-// pub use self::balance_statement::Movement;
-
 pub mod parser {
     
 	use balance_statement::BalanceStatement;
@@ -13,6 +10,7 @@ pub mod parser {
 	use quick_xml::Reader;
 	use quick_xml::events::Event;
 	use std::str;
+	use std::collections::HashMap;
 
 pub fn parse(document:&str)-> BalanceStatement{
 
@@ -22,17 +20,21 @@ pub fn parse(document:&str)-> BalanceStatement{
 	let mut txt = Vec::new();
 	let mut buf = Vec::new();
 
-	let mut period: String = String::from("");
+	let mut atts = HashMap::new();
 
 	loop {
 	    match reader.read_event(&mut buf) {
 	        Ok(Event::Start(ref e)) => {
 	            match e.name() {
 	                b"DG:DatosGenerales" => {
-	                	let vaca = &e.attributes()
-	                                    .map(|a| a.unwrap().value)
-	                                    .collect::<Vec<_>>()[1];
-	                    period = str::from_utf8(vaca).unwrap().to_string();
+
+						for att in e.attributes(){
+							let cow = att.unwrap();
+	                		let key = str::from_utf8(cow.key).unwrap().to_string();
+	                		let value = str::from_utf8(&cow.value).unwrap().to_string();
+	                		atts.insert(key,value);
+	                	}
+
 	                }
 	                _ => (),
 	            }
@@ -47,12 +49,12 @@ pub fn parse(document:&str)-> BalanceStatement{
 	    buf.clear();
 	}
 
-	let period = period.split('-').collect::<Vec<&str>>();
+	let period = atts.get("periodo").unwrap().split('-').collect::<Vec<&str>>();
 	let period_start:Date<Local> = Local.datetime_from_str(&(period[0].to_string()+"00:00:00"),"%d/%m/%Y%H:%M:%S").unwrap().date();
 	let period_end:Date<Local>= Local.datetime_from_str(&(period[1].to_string()+"00:00:00"),"%d/%m/%Y%H:%M:%S").unwrap().date();
 
 		BalanceStatement::new(	
-			String::from(""),
+			atts.get("numerodecuenta").unwrap().to_string(),
 			period_start,
 			period_end,
 			0.0,
