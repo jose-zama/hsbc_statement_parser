@@ -6,6 +6,7 @@ pub mod balance_statement;
 pub mod parser {
     
 	use balance_statement::BalanceStatement;
+	use balance_statement::Movement;
 	use chrono::prelude::*;
 	use quick_xml::Reader;
 	use quick_xml::events::Event;
@@ -21,6 +22,7 @@ pub fn parse(document:&str)-> BalanceStatement{
 	let mut buf = Vec::new();
 
 	let mut atts = HashMap::new();
+	let mut movs = Vec::new();
 
 	loop {
 	    match reader.read_event(&mut buf) {
@@ -34,6 +36,22 @@ pub fn parse(document:&str)-> BalanceStatement{
 	                		let value = str::from_utf8(&cow.value).unwrap().to_string();
 	                		atts.insert(key,value);
 	                	}
+
+	                }
+	                b"DG:MovimientosDelCliente" => {
+	                	let mut atts = HashMap::new();
+						for att in e.attributes(){
+							let cow = att.unwrap();
+	                		let key = str::from_utf8(cow.key).unwrap().to_string();
+	                		let value = str::from_utf8(&cow.value).unwrap().to_string();
+	                		atts.insert(key,value);
+	                	}
+	                	movs.push(Movement::new(
+	                		atts.get("descripcion").unwrap().to_string(),
+							Local.datetime_from_str(&atts.get("fecha").unwrap().to_string(),"%Y-%m-%dT%H:%M:%S").unwrap(),
+							atts.get("importe").unwrap().parse::<f64>().unwrap(),
+							String::from("UNKNOWN"),
+	                		));
 
 	                }
 	                _ => (),
@@ -61,7 +79,7 @@ pub fn parse(document:&str)-> BalanceStatement{
 			0.0,
 			0.0,
 			0.0,		
-			Vec::new(),			
+			movs,			
 		)
 	}
 
