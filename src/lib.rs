@@ -46,10 +46,22 @@ pub fn parse(document:&str)-> BalanceStatement{
 	                		let value = str::from_utf8(&cow.value).unwrap().to_string();
 	                		atts.insert(key,value);
 	                	}
+
+	                	let mut amount = atts.get("importe").unwrap().to_string();
+
+	                	let desc = atts.get("descripcion").unwrap().to_string();
+	                	{
+		                	let id= desc.split(' ').collect::<Vec<&str>>()[0];
+
+		                	match id {
+		                		"NETNM" | "ABONO" => amount = format!("-{}",amount),
+		                		_ => (),
+		                	}
+						}
 	                	movs.push(Movement::new(
-	                		atts.get("descripcion").unwrap().to_string(),
+	                		desc,
 							Local.datetime_from_str(&atts.get("fecha").unwrap().to_string(),"%Y-%m-%dT%H:%M:%S").unwrap(),
-							atts.get("importe").unwrap().to_string(),
+							amount,
 							String::from("UNKNOWN"),
 	                		));
 

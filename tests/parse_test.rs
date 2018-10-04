@@ -96,6 +96,82 @@ fn parse_document_with_one_mov(){
 	assert_eq!(result, expected);
 }
 
+#[test]
+fn parse_document_should_make_negative_amount_a_mov_that_starts_with_uppercase_netnm(){
+	//setup
+	let xml = r#"<?xml ?>
+	<cfdi:Comprobante>
+	<cfdi:Addenda>
+	<DG:DatosGenerales periodo="01/08/2018-31/08/2018" numerodecuenta="000001234567890" 	>
+	<DG:Movimientos>
+		<DG:MovimientosDelCliente fecha="2018-08-01T12:00:00" descripcion="NETNM" importe="97.00">
+		</DG:MovimientosDelCliente>
+	</DG:Movimientos>
+	</DG:DatosGenerales>
+	</cfdi:Addenda>
+	</cfdi:Comprobante>"#;
+
+	//run
+	let result=parse(xml);
+
+	//assert	
+	let movement = Movement::new(
+		String::from("NETNM"),
+		Local.ymd(2018,08,01).and_hms(12,00,00),
+		"-97.00".to_string(),
+		String::from("UNKNOWN"),
+		);
+
+	let movs = vec![movement];
+
+	let expected:BalanceStatement = BalanceStatement::new(
+		String::from("000001234567890"),
+		Local.ymd(2018,08,01),
+		Local.ymd(2018,08,31),
+		"0".to_string(),
+		movs,
+	);
+	assert_eq!(result, expected);
+}
+
+#[test]
+fn parse_document_should_make_negative_amount_a_mov_that_starts_with_uppercase_abono(){
+	//setup
+	let xml = r#"<?xml ?>
+	<cfdi:Comprobante>
+	<cfdi:Addenda>
+	<DG:DatosGenerales periodo="01/08/2018-31/08/2018" numerodecuenta="000001234567890" 	>
+	<DG:Movimientos>
+		<DG:MovimientosDelCliente fecha="2018-08-01T12:00:00" descripcion="ABONO asdasd jiasjis" importe="97.00">
+		</DG:MovimientosDelCliente>
+	</DG:Movimientos>
+	</DG:DatosGenerales>
+	</cfdi:Addenda>
+	</cfdi:Comprobante>"#;
+
+	//run
+	let result=parse(xml);
+
+	//assert	
+	let movement = Movement::new(
+		String::from("ABONO asdasd jiasjis"),
+		Local.ymd(2018,08,01).and_hms(12,00,00),
+		"-97.00".to_string(),
+		String::from("UNKNOWN"),
+		);
+
+	let movs = vec![movement];
+
+	let expected:BalanceStatement = BalanceStatement::new(
+		String::from("000001234567890"),
+		Local.ymd(2018,08,01),
+		Local.ymd(2018,08,31),
+		"0".to_string(),
+		movs,
+	);
+	assert_eq!(result, expected);
+}
+
 
 
 
