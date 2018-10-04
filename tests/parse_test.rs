@@ -26,10 +26,7 @@ fn parse_document_with_0_movs_should_return_a_balance_statement_with_empty_movs(
 		String::from("000001234567890"),
 		Local.ymd(2018,08,01),
 		Local.ymd(2018,08,31),
-		0.0,
-		0.0,
-		0.0,
-		0.0,
+		"0".to_string(),
 		Vec::new(),
 	);
 	assert_eq!(result, expected);
@@ -55,15 +52,11 @@ fn parse_document_with_unordered_atts_should_return_a_balance_statement_with_emp
 		String::from("000001234567890"),
 		Local.ymd(2018,08,01),
 		Local.ymd(2018,08,31),
-		0.0,
-		0.0,
-		0.0,
-		0.0,
+		"0".to_string(),
 		Vec::new(),
 	);
 	assert_eq!(result, expected);
 }
-
 
 #[test]
 fn parse_document_with_one_mov(){
@@ -87,7 +80,7 @@ fn parse_document_with_one_mov(){
 	let movement = Movement::new(
 		String::from("8213354446LGR 150220P98CAFE BARISTI COSM"),
 		Local.ymd(2018,08,01).and_hms(12,00,00),
-		97.00,
+		"97.00".to_string(),
 		String::from("UNKNOWN"),
 		);
 
@@ -97,13 +90,12 @@ fn parse_document_with_one_mov(){
 		String::from("000001234567890"),
 		Local.ymd(2018,08,01),
 		Local.ymd(2018,08,31),
-		0.0,
-		0.0,
-		0.0,
-		0.0,
+		"0".to_string(),
 		movs,
 	);
 	assert_eq!(result, expected);
 }
+
+
 
 

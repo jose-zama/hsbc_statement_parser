@@ -1,14 +1,15 @@
 use chrono::prelude::*;
+use std::fmt;
 
 #[derive(Debug, PartialEq)]
 pub struct BalanceStatement {
 	account: String,
 	period_start: Date<Local>,
 	period_end: Date<Local>,		
-	initial_balance: f64,
-	balance: f64,		
-	ingress: f64,
-	egress: f64,
+	initial_balance: Money,
+	balance: Money,		
+	ingress: Money,
+	egress: Money,
     movements: Vec<Movement>
 }
 
@@ -17,12 +18,15 @@ impl BalanceStatement {
     	account: String,
     	period_start: Date<Local>,
 		period_end: Date<Local>,		
-		initial_balance: f64,
-		balance: f64,		
-		ingress: f64,
-		egress: f64,
+		initial_balance: String,
 	    movements: Vec<Movement>
     ) -> BalanceStatement{
+
+
+    	let balance = Money(movements.iter().fold(0,|total,mov| total+(mov.amount.0)));
+    	let initial_balance = Money::new(initial_balance);
+    	let ingress = Money::new("0".to_string());
+    	let egress = Money::new("0".to_string());
     	BalanceStatement{
 			account,
 			period_start,
@@ -34,18 +38,23 @@ impl BalanceStatement {
 		    movements
     	}
     }
+
+    pub fn balance(&self)-> String{
+		self.balance.to_string()
+	}
 }
 
 #[derive(Debug, PartialEq)]
 pub struct Movement{
-	description: String,
-	date: DateTime<Local>,
-	amount: f64,
-	parent_group: String,
+	pub description: String,
+	pub date: DateTime<Local>,
+	amount: Money,
+	pub parent_group: String,
 }
 
 impl Movement{
-	pub fn new(description:String, date:DateTime<Local>, amount:f64, parent_group:String) -> Movement{
+	pub fn new(description:String, date:DateTime<Local>, amount:String, parent_group:String) -> Movement{
+		let amount = Money::new(amount);
 		Movement{
 			description,
 			date,
@@ -53,4 +62,39 @@ impl Movement{
 			parent_group,
 		}
 	}
+
+}
+
+#[derive(PartialEq)]
+pub struct Money(i64);
+
+impl Money{
+	pub fn new(amount:String) -> Money{
+		let amount = ((amount.parse::<f64>().unwrap())*100.00).trunc() as i64;
+		Money(amount)
+	}
+}
+
+impl fmt::Display for Money {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    	if self.0 == 0{
+    		return write!(f, "{}", format!("0.00"))
+    	}
+    	let money = self.0.to_string();
+		let integers = &money[..money.len()-2];
+    	let decimals = &money[money.len()-2..];
+        write!(f, "{}", format!("{}.{}",integers,decimals))
+    }
+}
+
+impl fmt::Debug for Money {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { 
+    	if self.0 == 0{
+    		return write!(f, "{}", format!("0.00"))
+    	}
+    	let money = self.0.to_string();
+		let integers = &money[..money.len()-2];
+    	let decimals = &money[money.len()-2..];
+        write!(f, "{}", format!("{}.{}",integers,decimals))
+    }
 }

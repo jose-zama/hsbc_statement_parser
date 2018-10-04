@@ -49,7 +49,7 @@ pub fn parse(document:&str)-> BalanceStatement{
 	                	movs.push(Movement::new(
 	                		atts.get("descripcion").unwrap().to_string(),
 							Local.datetime_from_str(&atts.get("fecha").unwrap().to_string(),"%Y-%m-%dT%H:%M:%S").unwrap(),
-							atts.get("importe").unwrap().parse::<f64>().unwrap(),
+							atts.get("importe").unwrap().to_string(),
 							String::from("UNKNOWN"),
 	                		));
 
@@ -75,10 +75,7 @@ pub fn parse(document:&str)-> BalanceStatement{
 			atts.get("numerodecuenta").unwrap().to_string(),
 			period_start,
 			period_end,
-			0.0,
-			0.0,
-			0.0,
-			0.0,		
+			"0".to_string(),	
 			movs,			
 		)
 	}
