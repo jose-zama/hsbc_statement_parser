@@ -3,9 +3,9 @@ use std::fmt;
 
 #[derive(Debug, PartialEq)]
 pub struct BalanceStatement {
-	account: String,
-	period_start: Date<Local>,
-	period_end: Date<Local>,		
+	pub account: String,
+	pub period_start: Date<Local>,
+	pub period_end: Date<Local>,		
 	initial_balance: Money,
 	balance: Money,		
 	ingress: Money,
@@ -49,6 +49,10 @@ impl BalanceStatement {
 	pub fn egress(&self)-> String{
 		self.egress.to_string()
 	}
+
+	pub fn movements(&self)-> &Vec<Movement>{
+		&self.movements
+	}
 }
 
 #[derive(Debug, PartialEq)]
@@ -68,6 +72,10 @@ impl Movement{
 			amount,
 			parent_group,
 		}
+	}
+
+	pub fn amount(&self)->String{
+		self.amount.to_string()
 	}
 
 }
