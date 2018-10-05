@@ -22,11 +22,10 @@ impl BalanceStatement {
 	    movements: Vec<Movement>
     ) -> BalanceStatement{
 
-
     	let balance = Money(movements.iter().fold(0,|total,mov| total+(mov.amount.0)));
     	let initial_balance = Money::new(initial_balance);
-    	let ingress = Money::new("0".to_string());
-    	let egress = Money::new("0".to_string());
+    	let ingress = Money(movements.iter().filter(|mov| mov.amount.0>0).fold(0,|total,mov| total+(mov.amount.0)));
+    	let egress = Money(movements.iter().filter(|mov| mov.amount.0<0).fold(0,|total,mov| total+(mov.amount.0)));
     	BalanceStatement{
 			account,
 			period_start,
@@ -41,6 +40,14 @@ impl BalanceStatement {
 
     pub fn balance(&self)-> String{
 		self.balance.to_string()
+	}
+
+    pub fn ingress(&self)-> String{
+		self.ingress.to_string()
+	}
+
+	pub fn egress(&self)-> String{
+		self.egress.to_string()
 	}
 }
 
@@ -66,10 +73,10 @@ impl Movement{
 }
 
 #[derive(PartialEq)]
-pub struct Money(i64);
+struct Money(i64);
 
 impl Money{
-	pub fn new(amount:String) -> Money{
+	fn new(amount:String) -> Money{
 		let amount = ((amount.parse::<f64>().unwrap())*100.00).trunc() as i64;
 		Money(amount)
 	}
