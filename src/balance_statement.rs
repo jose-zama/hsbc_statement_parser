@@ -22,8 +22,8 @@ impl BalanceStatement {
 	    movements: Vec<Movement>
     ) -> BalanceStatement{
 
-    	let balance = Money(movements.iter().fold(0,|total,mov| total+(mov.amount.0)));
     	let initial_balance = Money::new(initial_balance);
+    	let balance = Money(movements.iter().fold(0,|total,mov| total+(mov.amount.0)) + initial_balance.0);
     	let ingress = Money(movements.iter().filter(|mov| mov.amount.0>0).fold(0,|total,mov| total+(mov.amount.0)));
     	let egress = Money(movements.iter().filter(|mov| mov.amount.0<0).fold(0,|total,mov| total+(mov.amount.0)));
     	BalanceStatement{

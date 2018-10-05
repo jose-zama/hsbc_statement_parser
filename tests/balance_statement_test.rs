@@ -116,4 +116,35 @@ fn new_should_return_statement_with_egress_being_the_sum_of_the_withdrawals(){
 	assert_eq!(result.egress(), "-1000.01");
 }
 
+#[test]
+fn new_should_return_statement_with_balance_value_plus_initial_balance(){
+	//setup
+	let movs = vec![
+		Movement::new(
+			String::from("Mov 1"),
+			Local::now(),
+			"-20.00".to_string(),
+			String::from("UNKNOWN"),
+		),
+ 		Movement::new(
+			String::from("Mov 2"),
+			Local::now(),
+			"20.00".to_string(),
+			String::from("UNKNOWN"),
+		)
+	];
+	
+	//run
+	let result = BalanceStatement::new(
+		String::from("000001234567890"),
+		Local.ymd(2018,08,01),
+		Local.ymd(2018,08,31),
+		"99.00".to_string(),
+		movs,
+	);
+
+	//assert	
+	assert_eq!(result.balance(), "99.00");
+}
+
 
